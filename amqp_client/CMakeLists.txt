@@ -18,7 +18,7 @@ find_package(spdlog_vendor REQUIRED)
 
 # Find rabbitmq_c
 include(./cmake/find_rabbitmq_c.cmake)
-findRabbitmqc()
+find_rabbitmq_c()
 
 # Lib
 add_library(${PROJECT_NAME} SHARED

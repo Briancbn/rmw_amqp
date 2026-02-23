@@ -16,22 +16,22 @@
 # Find RabbitMQ C library
 #
 
-macro(findRabbitmqc)
+macro(find_rabbitmq_c)
 
   # Try using the CMake config modules first
   find_package(rabbitmq-c CONFIG QUIET)
-  if (rabbitmq-c_FOUND)
+  if(rabbitmq-c_FOUND)
       set(Rabbitmqc_LIBRARY rabbitmq::rabbitmq)
       get_target_property(Rabbitmqc_INCLUDE_DIRS ${Rabbitmqc_LIBRARY} INTERFACE_INCLUDE_DIRECTORIES)
   else()
     # Find the Rabbitmq C library
     find_path(Rabbitmqc_INCLUDE_DIR
-    	NAMES amqp.h
+      NAMES amqp.h
       HINTS ${Rabbitmqc_DIR}/include
     )
 
     find_library(Rabbitmqc_LIBRARY
-    	NAMES rabbitmq
+      NAMES rabbitmq
       HINTS ${Rabbitmqc_DIR}/lib
     )
 
@@ -67,33 +67,36 @@ macro(_amqp_libfind_process PREFIX)
       if(${i})
         set(${PREFIX}_INCLUDE_DIRS ${${PREFIX}_INCLUDE_DIRS} ${${i}})
         mark_as_advanced(${i})
-      else(${i})
+      else()
         set(${PREFIX}_FOUND FALSE)
-      endif(${i})
-    endforeach(i)
+      endif()
+    endforeach()
 
     # Process all libraries and set _FOUND to false if any are missing
     foreach(i ${${PREFIX}_PROCESS_LIBS})
       if(${i})
         set(${PREFIX}_LIBRARIES ${${PREFIX}_LIBRARIES} ${${i}})
         mark_as_advanced(${i})
-      else(${i})
+      else()
         set(${PREFIX}_FOUND FALSE)
-      endif(${i})
-    endforeach(i)
+      endif()
+    endforeach()
 
     # Print message and/or exit on fatal error
     if(${PREFIX}_FOUND)
       if(NOT ${PREFIX}_FIND_QUIETLY)
         message(STATUS "Found ${PREFIX} ${${PREFIX}_VERSION}")
-      endif(NOT ${PREFIX}_FIND_QUIETLY)
-    else(${PREFIX}_FOUND)
+      endif()
+    else()
       if(${PREFIX}_FIND_REQUIRED)
         foreach(i ${${PREFIX}_PROCESS_INCLUDES} ${${PREFIX}_PROCESS_LIBS})
           message("${i}=${${i}}")
-        endforeach(i)
-        message(FATAL_ERROR "Required library ${PREFIX} NOT FOUND.\nInstall the library (dev version) and try again. If the library is already installed, use ccmake to set the missing variables manually.")
-      endif(${PREFIX}_FIND_REQUIRED)
-    endif(${PREFIX}_FOUND)
-  endif(NOT ${PREFIX}_FOUND)
+        endforeach()
+        message(FATAL_ERROR "Required library ${PREFIX} NOT FOUND.\n\
+          Install the library (dev version) and try again. \
+          If the library is already installed, \
+          use cmake to set the missing variables manually.")
+      endif()
+    endif()
+  endif()
 endmacro()

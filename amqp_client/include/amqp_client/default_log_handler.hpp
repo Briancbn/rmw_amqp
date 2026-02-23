@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AMQP_CLIENT__SPDLOG_LOG_HANDLER_HPP_
-#define AMQP_CLIENT__SPDLOG_LOG_HANDLER_HPP_
+#ifndef AMQP_CLIENT__DEFAULT_LOG_HANDLER_HPP_
+#define AMQP_CLIENT__DEFAULT_LOG_HANDLER_HPP_
 
 #include <memory>
 
@@ -56,4 +56,4 @@ public:
 
 }  // namespace amqp_client
 
-#endif  // AMQP_CLIENT__SPDLOG_LOG_HANDLER_HPP_
+#endif  // AMQP_CLIENT__DEFAULT_LOG_HANDLER_HPP_

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include <gmock/gmock-matchers.h>
-#include <memory>
+
 #include "amqp_client/log.hpp"
 
 namespace amqp_client
@@ -29,7 +29,8 @@ class MockLogHandler : public LogHandler
 {
 public:
   MockLogHandler() = default;
-  virtual ~MockLogHandler() {
+  virtual ~MockLogHandler()
+  {
     die();
   }
 
