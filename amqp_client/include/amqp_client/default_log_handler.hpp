@@ -39,8 +39,8 @@ public:
   /// Construct a new DefaultLogHandler object
   DefaultLogHandler();
 
-  /// Construct a new DefaultLogHandler with a custom spdlog object
-  explicit DefaultLogHandler(std::shared_ptr<spdlog::logger> logger);
+  /// Override default spdlog instance with a custom spdlog object
+  static void set_spdlog_default_logger(std::shared_ptr<spdlog::logger> logger);
 
   /// Function to log a message
   /**

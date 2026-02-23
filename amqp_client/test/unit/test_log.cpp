@@ -17,6 +17,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
+#include "../utils/string_utils.hpp"
 #include "amqp_client/log.hpp"
 
 namespace amqp_client
@@ -46,6 +47,23 @@ public:
 class TestLog : public ::testing::Test
 {
 public:
+  void log_all()
+  {
+    AMQP_CLIENT_LOG_DEBUG("hello from debug");
+    AMQP_CLIENT_LOG_INFO("hello from info");
+    AMQP_CLIENT_LOG_WARN("hello from warn");
+    AMQP_CLIENT_LOG_ERROR("hello from error");
+    AMQP_CLIENT_LOG_FATAL("hello from fatal");
+  }
+
+  void log_none()
+  {
+    // This is a potential edge case
+    using amqp_client::log::log;
+    using amqp_client::LogLevel;
+    log(__FILE__, __LINE__, LogLevel::NONE, "hello from none");
+  }
+
   void TearDown() override
   {
     using amqp_client::log::unregisterLogHandler;
@@ -58,21 +76,17 @@ public:
 };
 
 TEST_F(TestLog, log_default) {
-  using amqp_client::log::setLogLevel;
-  using amqp_client::log::log;
+  using amqp_client::log::getLogLevel;
   using amqp_client::LogLevel;
 
-  setLogLevel(LogLevel::DEBUG);
-
-  log(__FILE__, __LINE__, LogLevel::DEBUG, "hello from debug");
-  log(__FILE__, __LINE__, LogLevel::INFO, "hello from info");
-  log(__FILE__, __LINE__, LogLevel::WARN, "hello from warn");
-  log(__FILE__, __LINE__, LogLevel::ERROR, "hello from error");
-  log(__FILE__, __LINE__, LogLevel::FATAL, "hello from fatal");
+  // Default log level is INFO
+  EXPECT_EQ(getLogLevel(), LogLevel::INFO);
+  log_all();
+  log_none();
 }
 
 
-TEST_F(TestLog, mock_registerLogHandler) {
+TEST_F(TestLog, register_mock_LogHandler) {
   using amqp_client::log::log;
   using amqp_client::LogLevel;
   using amqp_client::log::MockLogHandler;
@@ -120,7 +134,16 @@ TEST_F(TestLog, mock_registerLogHandler) {
   EXPECT_CALL(*mock_log_handler_raw_ptr, die()).Times(1);
 }
 
-TEST_F(TestLog, mock_unregisterLogHandler) {
+TEST_F(TestLog, register_null_LogHandler) {
+  using amqp_client::log::log;
+  using amqp_client::LogLevel;
+  using amqp_client::log::registerLogHandler;
+  registerLogHandler(nullptr);
+
+  log(__FILE__, __LINE__, LogLevel::INFO, "hello from default logger");
+}
+
+TEST_F(TestLog, unregister_mock_LogHandler) {
   using amqp_client::LogLevel;
   using amqp_client::log::log;
   using amqp_client::log::MockLogHandler;
@@ -136,4 +159,46 @@ TEST_F(TestLog, mock_unregisterLogHandler) {
   unregisterLogHandler();
 
   log(__FILE__, __LINE__, LogLevel::INFO, "hello from default logger");
+}
+
+TEST_F(TestLog, log_level) {
+  using amqp_client::log::setLogLevel;
+  using amqp_client::log::getLogLevel;
+  using amqp_client::LogLevel;
+
+  // Default log level is INFO
+  EXPECT_EQ(getLogLevel(), LogLevel::INFO);
+
+  // log level set to WARN
+  setLogLevel(LogLevel::WARN);
+  EXPECT_EQ(getLogLevel(), LogLevel::WARN);
+  log_all();
+
+  // log level set to DEBUG
+  setLogLevel(LogLevel::DEBUG);
+  EXPECT_EQ(getLogLevel(), LogLevel::DEBUG);
+  log_all();
+
+  // log level set to NONE
+  setLogLevel(LogLevel::NONE);
+  EXPECT_EQ(getLogLevel(), LogLevel::NONE);
+  log_all();
+}
+
+TEST_F(TestLog, long_buffer) {
+  using amqp_client::test_utils::generate_random_string;
+  using amqp_client::log::MockLogHandler;
+  using ::testing::_;
+  using ::testing::StrEq;
+
+  auto mock_log_handler = std::make_unique<MockLogHandler>();
+  MockLogHandler * mock_log_handler_raw_ptr = mock_log_handler.get();
+  registerLogHandler(std::move(mock_log_handler));
+
+  std::string long_buffer = generate_random_string(2048);
+  EXPECT_CALL(*mock_log_handler_raw_ptr, log(_, _, _, StrEq(long_buffer.c_str()))).Times(1);
+  AMQP_CLIENT_LOG_INFO("%s", long_buffer.c_str());
+
+  // Cleanup is expected
+  EXPECT_CALL(*mock_log_handler_raw_ptr, die()).Times(1);
 }

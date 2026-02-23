@@ -12,24 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+#include <sstream>
 
 #include "gtest/gtest.h"
-#include "amqp_client/log.hpp"
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/ostream_sink.h"
+#include "amqp_client/default_log_handler.hpp"
 
-class TestLog : public ::testing::Test
+class TestDefaultLogHandler : public ::testing::Test
 {
+public:
+  void TearDown() override
+  {
+    using amqp_client::log::DefaultLogHandler;
+    DefaultLogHandler::set_spdlog_default_logger(spdlog::default_logger());
+  }
 };
 
-TEST_F(TestLog, log) {
-  using amqp_client::log::setLogLevel;
+TEST_F(TestDefaultLogHandler, custom_default_spdlog_logger__oss_sink) {
+  using amqp_client::log::DefaultLogHandler;
   using amqp_client::log::log;
   using amqp_client::LogLevel;
 
-  setLogLevel(LogLevel::DEBUG);
+  std::ostringstream oss;
+  auto ostream_sink = std::make_shared<spdlog::sinks::ostream_sink_st>(oss);
+  auto ostream_logger = std::make_shared<spdlog::logger>("ostream_logger", ostream_sink);
+  DefaultLogHandler::set_spdlog_default_logger(ostream_logger);
 
   log(__FILE__, __LINE__, LogLevel::DEBUG, "hello from debug");
+  EXPECT_TRUE(oss.str().empty());
+
   log(__FILE__, __LINE__, LogLevel::INFO, "hello from info");
-  log(__FILE__, __LINE__, LogLevel::WARN, "hello from warn");
-  log(__FILE__, __LINE__, LogLevel::ERROR, "hello from error");
-  log(__FILE__, __LINE__, LogLevel::FATAL, "hello from fatal");
+  EXPECT_EQ(oss.str().substr(30), "INFO: hello from info (test_default_log_handler.cpp:46)\n");
+}
+
+TEST_F(TestDefaultLogHandler, custom_default_spdlog_logger__nullptr) {
+  using amqp_client::log::DefaultLogHandler;
+  using amqp_client::log::log;
+  using amqp_client::LogLevel;
+
+  DefaultLogHandler::set_spdlog_default_logger(nullptr);
+  log(__FILE__, __LINE__, LogLevel::INFO, "hello from default logger");
 }

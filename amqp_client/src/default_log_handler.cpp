@@ -25,17 +25,28 @@ namespace amqp_client
 namespace log
 {
 
-DefaultLogHandler::DefaultLogHandler()
+namespace
+{
+
+void init_spdlog()
 {
   spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] %^%8l%$: %v");
   spdlog::set_level(spdlog::level::debug);
 }
+}
 
-DefaultLogHandler::DefaultLogHandler(std::shared_ptr<spdlog::logger> logger)
+DefaultLogHandler::DefaultLogHandler()
 {
+  init_spdlog();
+}
+
+void DefaultLogHandler::set_spdlog_default_logger(std::shared_ptr<spdlog::logger> logger)
+{
+  if (!logger) {
+    return;
+  }
   spdlog::set_default_logger(logger);
-  spdlog::set_pattern("[%Y-%m-%d %H:%M:%S.%e] %^%8l%$: %v");
-  spdlog::set_level(spdlog::level::debug);
+  init_spdlog();
 }
 
 void DefaultLogHandler::log(
