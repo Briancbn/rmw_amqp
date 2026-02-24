@@ -15,6 +15,7 @@
 #ifndef AMQP_CLIENT__AMQP_ERROR_HPP_
 #define AMQP_CLIENT__AMQP_ERROR_HPP_
 
+#include <cstdint>
 #include <string>
 #include <vector>
 
