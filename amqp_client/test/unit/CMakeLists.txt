@@ -16,3 +16,11 @@ target_link_libraries(test_default_log_handler
   ${PROJECT_NAME}
   spdlog::spdlog
 )
+
+# ERROR
+ament_add_gtest(test_amqp_error
+  test_amqp_error.cpp
+)
+target_link_libraries(test_amqp_error
+  ${PROJECT_NAME}
+)
