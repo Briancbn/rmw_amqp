@@ -23,8 +23,10 @@ find_rabbitmq_c()
 # Lib
 add_library(${PROJECT_NAME} SHARED
   src/amqp_error.cpp
-  src/log.cpp
+  src/connection_info.cpp
   src/default_log_handler.cpp
+  src/log.cpp
+  src/rabbitmq_c_api.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

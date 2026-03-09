@@ -24,7 +24,8 @@ namespace amqp_client
 AMQPError::AMQPError()
 : type_(AMQPExceptionType::NORMAL),
   server_error_(nullptr),
-  library_error_(0)
+  library_error_(0),
+  message_("")
 {
 }
 
@@ -96,6 +97,14 @@ bool AMQPError::from_amqp_rpc_reply(
   return static_cast<bool>(*error);
 }
 
+void AMQPError::from_message(
+  const std::string & message,
+  AMQPError * error
+) {
+  error->type_ = AMQPExceptionType::CUSTOM;
+  error->message_ = message;
+}
+
 std::string AMQPError::str() const
 {
   std::string result;
@@ -110,6 +119,7 @@ std::string AMQPError::str() const
       result = amqp_error_string2(library_error_);
       break;
     case AMQPExceptionType::SERVER:
+    {
       std::ostringstream oss;
       switch (server_error_->method) {
         case AMQP_CONNECTION_CLOSE_METHOD:
@@ -128,6 +138,10 @@ std::string AMQPError::str() const
           break;
       }
       result = oss.str();
+      break;
+    }
+    case AMQPExceptionType::CUSTOM:
+      result = message_;
       break;
   }
   return result;

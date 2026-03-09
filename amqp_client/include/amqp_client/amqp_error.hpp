@@ -29,7 +29,8 @@ enum class AMQPExceptionType
   NORMAL = 0,
   NONE,
   LIBRARY,
-  SERVER
+  SERVER,
+  CUSTOM
 };
 
 struct AMQPServerError
@@ -52,6 +53,11 @@ public:
     AMQPError * error
   );
 
+  static void from_message(
+    const std::string & message,
+    AMQPError * error
+  );
+
   std::string str() const;
 
   /// boolean operator for the AMQPError class
@@ -68,6 +74,7 @@ private:
   AMQPExceptionType type_;
   AMQPServerError * server_error_;
   int library_error_;
+  std::string message_;
 };
 
 }  // namespace amqp_client

@@ -22,8 +22,62 @@
 #include "amqp.h"  // NOLINT(build/include_subdir)
 #endif
 
+#include "amqp_client/amqp_error.hpp"
+#include "amqp_client/sasl_config.hpp"
+#include "amqp_client/macros.hpp"
+
 namespace amqp_client
 {
+
+class RabbitmqCInterface
+{
+public:
+  RabbitmqCInterface() = default;
+  virtual ~RabbitmqCInterface() {};
+
+  virtual amqp_connection_state_t new_connection() = 0;
+
+  virtual amqp_socket_t * tcp_socket_new(amqp_connection_state_t state) = 0;
+
+  virtual int socket_open(amqp_socket_t * self, const char * host, int port) = 0;
+
+  virtual amqp_rpc_reply_t login(
+    amqp_connection_state_t state,
+    const char * vhost,
+    int channel_max,
+    int frame_max,
+    int heartbeat,
+    const SASLConfig * sasl_config
+  ) = 0;
+
+private:
+  AMQP_CLIENT_DISABLE_COPY(RabbitmqCInterface)
+};
+
+class RabbitmqCApi : public RabbitmqCInterface
+{
+public:
+  RabbitmqCApi();
+  virtual ~RabbitmqCApi();
+
+  amqp_connection_state_t new_connection() override;
+
+  amqp_socket_t * tcp_socket_new(amqp_connection_state_t state) override;
+
+  int socket_open(amqp_socket_t * self, const char * host, int port) override;
+
+  amqp_rpc_reply_t login(
+    amqp_connection_state_t state,
+    const char * vhost,
+    int channel_max,
+    int frame_max,
+    int heartbeat,
+    const SASLConfig * sasl_config
+  ) override;
+
+private:
+  AMQP_CLIENT_DISABLE_COPY(RabbitmqCApi)
+};
 
 }  // namespace amqp_client
 
