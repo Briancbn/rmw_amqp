@@ -33,7 +33,7 @@ class RabbitmqCInterface
 {
 public:
   RabbitmqCInterface() = default;
-  virtual ~RabbitmqCInterface() {};
+  virtual ~RabbitmqCInterface() {}
 
   virtual amqp_connection_state_t new_connection() = 0;
 

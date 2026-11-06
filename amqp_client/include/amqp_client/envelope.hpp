@@ -21,7 +21,8 @@
 namespace amqp_client
 {
 
-struct Envelope {
+struct Envelope
+{
   int channel;
   std::string consumer_tag;
   uint64_t delivery_tag;

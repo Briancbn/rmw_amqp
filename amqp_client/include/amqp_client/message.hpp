@@ -20,7 +20,8 @@
 namespace amqp_client
 {
 
-struct Message {
+struct Message
+{
   // TODO(Briancbn): property
   std::string body;
   // TODO(Briancbn): pool / pagination

@@ -100,7 +100,8 @@ bool AMQPError::from_amqp_rpc_reply(
 void AMQPError::from_message(
   const std::string & message,
   AMQPError * error
-) {
+)
+{
   error->type_ = AMQPExceptionType::CUSTOM;
   error->message_ = message;
 }
@@ -119,27 +120,27 @@ std::string AMQPError::str() const
       result = amqp_error_string2(library_error_);
       break;
     case AMQPExceptionType::SERVER:
-    {
-      std::ostringstream oss;
-      switch (server_error_->method) {
-        case AMQP_CONNECTION_CLOSE_METHOD:
-          oss << "server connection error " << server_error_->reply_code <<
-            ", message: " << server_error_->reply_text;
-          break;
-        case AMQP_CHANNEL_CLOSE_METHOD:
-          oss << "server channel error " << server_error_->reply_code <<
-            ", message: " << server_error_->reply_text;
-          break;
-        default:
-          oss << "unknown server error, method id 0x"
-              << std::uppercase << std::hex
-              << std::setw(8) << std::setfill('0')
-              << server_error_->method;
-          break;
+      {
+        std::ostringstream oss;
+        switch (server_error_->method) {
+          case AMQP_CONNECTION_CLOSE_METHOD:
+            oss << "server connection error " << server_error_->reply_code <<
+              ", message: " << server_error_->reply_text;
+            break;
+          case AMQP_CHANNEL_CLOSE_METHOD:
+            oss << "server channel error " << server_error_->reply_code <<
+              ", message: " << server_error_->reply_text;
+            break;
+          default:
+            oss << "unknown server error, method id 0x"
+                << std::uppercase << std::hex
+                << std::setw(8) << std::setfill('0')
+                << server_error_->method;
+            break;
+        }
+        result = oss.str();
+        break;
       }
-      result = oss.str();
-      break;
-    }
     case AMQPExceptionType::CUSTOM:
       result = message_;
       break;

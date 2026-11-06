@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AMQP_CLIENT__TRANPORT_HPP_
-#define AMQP_CLIENT__TRANPORT_HPP_
+#ifndef AMQP_CLIENT__TRANSPORT_HPP_
+#define AMQP_CLIENT__TRANSPORT_HPP_
 
 #include <memory>
 #include <string>
@@ -34,7 +34,8 @@ public:
   virtual ~Transport() = default;
   std::shared_ptr<Connection> create_connection(
     AMQPError * error = nullptr
-  ) {
+  )
+  {
     return create_connection(
       std::make_shared<ConnectionInfo>(), error
     );

@@ -25,7 +25,8 @@ namespace amqp_client
 
 class Channel;
 
-class Connection {
+class Connection
+{
 public:
   Connection() = default;
   virtual ~Connection() {}

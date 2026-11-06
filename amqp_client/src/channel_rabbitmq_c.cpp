@@ -48,42 +48,48 @@ std::shared_ptr<amqp_client::Channel> Connection::channel(
 )
 {
   if (error == nullptr) {
-  if (connection_ == nullptr) {
-    if (error != nullptr) {
-      AMQPError::from_message(
-        "Error creating channel: connection is null",
-        error
-      );
+    if (connection_ == nullptr) {
+      if (error != nullptr) {
+        AMQPError::from_message(
+          "Error creating channel: connection is null",
+          error
+        );
+      }
+      return nullptr;
     }
-    return nullptr;
-  }
 
-  amqp_channel_t channel_id;
-  if (channel_number == nullptr) {
-    channel_id = _next_channel_id();
-  } else {
-    channel_id = *channel_number;
-  }
-  amqp_channel_open(connection_, channel_id);
+    amqp_channel_t channel_id;
+    if (channel_number == nullptr) {
+      channel_id = _next_channel_id();
+    } else {
+      channel_id = *channel_number;
+    }
+    amqp_channel_open(connection_, channel_id);
 
-  if(!rabbitmq_c_interface_->process_amqp_rpc_reply(
-      amqp_get_rpc_reply(connection_),
-      "Error logging in",
-      error
-    )) {
-    return nullptr;
-  }
+    if (!rabbitmq_c_interface_->process_amqp_rpc_reply(
+        amqp_get_rpc_reply(connection_),
+        "Error logging in",
+        error
+    ))
+    {
+      return nullptr;
+    }
 
-  channel_ids_.emplace(channel_id);
-  if (channel_number == nullptr) {
-    last_channel_id_ = channel_id;
+    channel_ids_.emplace(channel_id);
+    if (channel_number == nullptr) {
+      last_channel_id_ = channel_id;
+    }
+    return std::make_shared<amqp::rabbitmq_c::Channel>(
+      connection_, channel_id,
+      rabbitmq_c_interface_);
   }
-  return std::make_shared<amqp::rabbitmq_c::Channel>(connection_, channel_id, rabbitmq_c_interface_);
+  return nullptr;
 }
 
 bool Connection::close(
   AMQPError * error
-) {
+)
+{
   if (connection_ == nullptr) {
     if (error != nullptr) {
       error->message = "Error closing connection: connection is null";
@@ -93,24 +99,23 @@ bool Connection::close(
 
   amqp_rpc_reply_t reply = amqp_connection_close(connection_, AMQP_REPLY_SUCCESS);
 
-  if(!rabbitmq_c_interface_->process_amqp_rpc_reply(reply, "Error closing connection", error)) {
+  if (!rabbitmq_c_interface_->process_amqp_rpc_reply(reply, "Error closing connection", error)) {
     return false;
   }
 
   return true;
 }
 
-amqp_channel_t Connection::_next_channel_id(
-) {
+amqp_channel_t Connection::_next_channel_id()
+{
   amqp_channel_t id = last_channel_id_ + 1;
 
   // increment until the channel id is not used
-  while(channel_ids_.find(id) != channel_ids_.end()) {
+  while (channel_ids_.find(id) != channel_ids_.end()) {
     id += 1;
   }
   return id;
 }
 
 }  // namespace rabbitmq_c
-}  // namespace amqp
-}  // namespace rmf2_scheduler
+}  // namespace amqp_client

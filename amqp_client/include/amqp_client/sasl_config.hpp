@@ -20,7 +20,8 @@
 namespace amqp_client
 {
 
-struct SASLConfig {
+struct SASLConfig
+{
   bool external;
   std::string username;
   std::string password;
@@ -29,4 +30,4 @@ struct SASLConfig {
 
 }  // namespace amqp_client
 
-#endif  // AMQP_CLIENT__SASL_HPP_
+#endif  // AMQP_CLIENT__SASL_CONFIG_HPP_

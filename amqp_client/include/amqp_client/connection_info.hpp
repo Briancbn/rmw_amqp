@@ -24,7 +24,8 @@
 namespace amqp_client
 {
 
-class ConnectionInfo : public std::enable_shared_from_this<ConnectionInfo> {
+class ConnectionInfo : public std::enable_shared_from_this<ConnectionInfo>
+{
 public:
   using Ptr = std::shared_ptr<ConnectionInfo>;
   using ConstPtr = std::shared_ptr<const ConnectionInfo>;

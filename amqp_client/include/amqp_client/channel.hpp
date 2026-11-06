@@ -26,28 +26,29 @@
 namespace amqp_client
 {
 
-class Channel {
+class Channel
+{
 public:
-  using MessageCallback = std::function<void(const Envelope &)>;
+  using MessageCallback = std::function<void (const Envelope &)>;
 
   virtual ~Channel() {}
 
   virtual bool exchange_declare(
     const std::string & exchange,
     const std::string & exchange_type = "direct",
-    bool passive=false,
-    bool durable=false,
-    bool auto_delete=false,
-    bool internal=false,
+    bool passive = false,
+    bool durable = false,
+    bool auto_delete = false,
+    bool internal = false,
     AMQPError * error = nullptr
   ) = 0;
 
   virtual std::string queue_declare(
     const std::string & queue,
-    bool passive=false,
-    bool durable=false,
-    bool exclusive=false,
-    bool auto_delete=false,
+    bool passive = false,
+    bool durable = false,
+    bool exclusive = false,
+    bool auto_delete = false,
     AMQPError * error = nullptr
   ) = 0;
 
@@ -70,10 +71,10 @@ public:
   virtual std::string basic_consume(
     const std::string & queue,
     MessageCallback on_message_callback,
-    bool no_local=false,
-    bool auto_ack=false,
-    bool exclusive=false,
-    const std::string & consumer_tag="",
+    bool no_local = false,
+    bool auto_ack = false,
+    bool exclusive = false,
+    const std::string & consumer_tag = "",
     AMQPError * error = nullptr
   ) = 0;
 

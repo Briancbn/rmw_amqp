@@ -56,7 +56,8 @@ amqp_rpc_reply_t RabbitmqCApi::login(
   int frame_max,
   int heartbeat,
   const SASLConfig * sasl_config
-) {
+)
+{
   // TODO(anyone): potential segfault when sasl_config is nullptr
   if (sasl_config->external) {
     return amqp_login(
@@ -82,4 +83,4 @@ amqp_rpc_reply_t RabbitmqCApi::login(
   }
 }
 
-}  // namespace amqp
+}  // namespace amqp_client

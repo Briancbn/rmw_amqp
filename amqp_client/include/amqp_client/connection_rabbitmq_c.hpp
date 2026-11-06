@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RMF2_SCHEDULER__AMQP__CONNECTION_RABBITMQ_C_HPP_
-#define RMF2_SCHEDULER__AMQP__CONNECTION_RABBITMQ_C_HPP_
+#ifndef AMQP_CLIENT__CONNECTION_RABBITMQ_C_HPP_
+#define AMQP_CLIENT__CONNECTION_RABBITMQ_C_HPP_
 
 #include <memory>
 #include <string>
@@ -30,7 +30,8 @@ namespace amqp_client
 namespace rabbitmq_c
 {
 
-class Connection : public amqp_client::Connection {
+class Connection : public amqp_client::Connection
+{
 public:
   Connection(
     const amqp_connection_state_t connection,
@@ -62,4 +63,4 @@ private:
 }  // namespace rabbitmq_c
 }  // namespace amqp_client
 
-#endif  // RMF2_SCHEDULER__AMQP__CONNECTION_RABBIT_MQ_C_HPP_
+#endif  // AMQP_CLIENT__CONNECTION_RABBITMQ_C_HPP_
