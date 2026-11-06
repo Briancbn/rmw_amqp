@@ -1,0 +1,70 @@
+#!/bin/bash
+# To use this locally, go to the root of your workspace
+# cd ~/<workspace-name>/
+# Then run ./src/<repo-name>/coverage.sh html
+# Coverage report will be generate automatically
+
+# Enable branch coverage for local report
+# ./src/<repo-name>/coverage.sh html
+
+# Install curl
+if ! [ -x "$(command -v lcov)" ];
+then
+  echo "LCOV could not be found"
+
+  if ! [ -x "$(command -v curl)" ];
+  then
+    sudo apt-get install -y -qq curl
+  fi
+
+  # Install LCOV 1.16
+  curl -OL https://github.com/linux-test-project/lcov/releases/download/v1.16/lcov-1.16.tar.gz
+  tar -xzvf lcov-1.16.tar.gz
+  sudo make -C lcov-1.16 install
+fi
+
+if [ "$1" = "ci" ]; then
+  cd ~/target_ws || return 1
+fi
+
+branch_command=()
+branch_html_command=()
+if [ "$2" = "--branch" ]; then
+  branch_command=(--rc "lcov_branch_coverage=1")
+  branch_html_command=(--branch-coverage)
+fi
+
+package_name=${TARGET_REPO_NAME:-"rmw_amqp"}
+
+ignored_files=("*/test/*" "*/examples/*")
+
+# Capture initial coverage info
+lcov --capture --initial \
+     --directory build \
+     --output-file initial_coverage.info "${branch_command[@]}" | grep -ve "^Processing"
+# Capture tested coverage info
+lcov --capture \
+     --directory build \
+     --output-file test_coverage.info "${branch_command[@]}" | grep -ve "^Processing"
+# Combine two report (exit function  when none of the records are valid)
+lcov --add-tracefile initial_coverage.info \
+     --add-tracefile test_coverage.info \
+     --output-file coverage.info "${branch_command[@]}" || return 0 \
+  && rm initial_coverage.info test_coverage.info
+# Extract repository files
+lcov --extract coverage.info "$(pwd)/src/$package_name/*" \
+     --output-file coverage.info "${branch_command[@]}" | grep -ve "^Extracting"
+# Filter out ignored files
+lcov --remove coverage.info "${ignored_files[@]}" \
+     --output-file coverage.info "${branch_command[@]}" | grep -ve "^removing"
+if [ "$1" = "ci" ]; then
+  # Some sed magic to remove identifiable absolute path
+  sed -i "s~$(pwd)/src/$package_name/~~g" coverage.info
+  lcov --list coverage.info "${branch_command[@]}"
+
+  cd - || return 1
+  cp -r ~/target_ws/coverage.info .
+
+elif [ "$1" = "html" ]; then
+  genhtml "${branch_html_command[@]}" coverage.info -o coverage
+fi
