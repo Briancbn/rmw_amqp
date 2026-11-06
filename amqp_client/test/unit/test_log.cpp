@@ -185,6 +185,82 @@ TEST_F(TestLog, log_level) {
   log_all();
 }
 
+TEST_F(TestLog, stream_macros_reach_handler) {
+  using amqp_client::LogLevel;
+  using amqp_client::log::setLogLevel;
+  using amqp_client::log::MockLogHandler;
+  using amqp_client::log::registerLogHandler;
+  using ::testing::_;
+  using ::testing::StrEq;
+
+  setLogLevel(LogLevel::DEBUG);
+
+  auto mock = std::make_unique<MockLogHandler>();
+  MockLogHandler * raw = mock.get();
+  registerLogHandler(std::move(mock));
+
+  EXPECT_CALL(*raw, log(_, _, LogLevel::DEBUG, StrEq("debug 1"))).Times(1);
+  AMQP_CLIENT_LOG_DEBUG_STREAM("debug " << 1);
+
+  EXPECT_CALL(*raw, log(_, _, LogLevel::INFO, StrEq("info 2"))).Times(1);
+  AMQP_CLIENT_LOG_INFO_STREAM("info " << 2);
+
+  EXPECT_CALL(*raw, log(_, _, LogLevel::WARN, StrEq("warn 3"))).Times(1);
+  AMQP_CLIENT_LOG_WARN_STREAM("warn " << 3);
+
+  EXPECT_CALL(*raw, log(_, _, LogLevel::ERROR, StrEq("error 4"))).Times(1);
+  AMQP_CLIENT_LOG_ERROR_STREAM("error " << 4);
+
+  EXPECT_CALL(*raw, log(_, _, LogLevel::FATAL, StrEq("fatal 5"))).Times(1);
+  AMQP_CLIENT_LOG_FATAL_STREAM("fatal " << 5);
+
+  EXPECT_CALL(*raw, die()).Times(1);
+}
+
+TEST_F(TestLog, stream_macro_respects_log_level) {
+  using amqp_client::LogLevel;
+  using amqp_client::log::setLogLevel;
+  using amqp_client::log::MockLogHandler;
+  using amqp_client::log::registerLogHandler;
+  using ::testing::_;
+
+  setLogLevel(LogLevel::WARN);
+
+  auto mock = std::make_unique<MockLogHandler>();
+  MockLogHandler * raw = mock.get();
+  registerLogHandler(std::move(mock));
+
+  EXPECT_CALL(*raw, log(_, _, LogLevel::DEBUG, _)).Times(0);
+  AMQP_CLIENT_LOG_DEBUG_STREAM("should not appear");
+
+  EXPECT_CALL(*raw, log(_, _, LogLevel::INFO, _)).Times(0);
+  AMQP_CLIENT_LOG_INFO_STREAM("should not appear");
+
+  EXPECT_CALL(*raw, log(_, _, LogLevel::WARN, _)).Times(1);
+  AMQP_CLIENT_LOG_WARN_STREAM("should appear");
+
+  EXPECT_CALL(*raw, die()).Times(1);
+}
+
+TEST_F(TestLog, stream_macro_concatenates_multiple_values) {
+  using amqp_client::LogLevel;
+  using amqp_client::log::MockLogHandler;
+  using amqp_client::log::registerLogHandler;
+  using ::testing::_;
+  using ::testing::StrEq;
+
+  auto mock = std::make_unique<MockLogHandler>();
+  MockLogHandler * raw = mock.get();
+  registerLogHandler(std::move(mock));
+
+  std::string key = "count";
+  int value = 42;
+  EXPECT_CALL(*raw, log(_, _, LogLevel::INFO, StrEq("count=42"))).Times(1);
+  AMQP_CLIENT_LOG_INFO_STREAM(key << "=" << value);
+
+  EXPECT_CALL(*raw, die()).Times(1);
+}
+
 TEST_F(TestLog, long_buffer) {
   using amqp_client::test_utils::generate_random_string;
   using amqp_client::log::MockLogHandler;

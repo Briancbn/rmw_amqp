@@ -18,6 +18,7 @@
 #define AMQP_CLIENT__LOG_HPP_
 
 #include <memory>
+#include <sstream>
 
 #define AMQP_CLIENT_LOG_DEBUG(...) \
   amqp_client::log::log(__FILE__, __LINE__, amqp_client::LogLevel::DEBUG, __VA_ARGS__)
@@ -29,6 +30,21 @@
   amqp_client::log::log(__FILE__, __LINE__, amqp_client::LogLevel::ERROR, __VA_ARGS__)
 #define AMQP_CLIENT_LOG_FATAL(...) \
   amqp_client::log::log(__FILE__, __LINE__, amqp_client::LogLevel::FATAL, __VA_ARGS__)
+
+#define AMQP_CLIENT_LOG_STREAM(level, args) \
+  do { \
+    std::ostringstream _amqp_ss; \
+    _amqp_ss << args; \
+    amqp_client::log::log( \
+      __FILE__, __LINE__, amqp_client::LogLevel::level, "%s", \
+      _amqp_ss.str().c_str()); \
+  } while (0)
+
+#define AMQP_CLIENT_LOG_DEBUG_STREAM(args) AMQP_CLIENT_LOG_STREAM(DEBUG, args)
+#define AMQP_CLIENT_LOG_INFO_STREAM(args)  AMQP_CLIENT_LOG_STREAM(INFO, args)
+#define AMQP_CLIENT_LOG_WARN_STREAM(args)  AMQP_CLIENT_LOG_STREAM(WARN, args)
+#define AMQP_CLIENT_LOG_ERROR_STREAM(args) AMQP_CLIENT_LOG_STREAM(ERROR, args)
+#define AMQP_CLIENT_LOG_FATAL_STREAM(args) AMQP_CLIENT_LOG_STREAM(FATAL, args)
 
 namespace amqp_client
 {
