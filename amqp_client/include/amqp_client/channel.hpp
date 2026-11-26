@@ -31,6 +31,7 @@ class Channel
 public:
   using MessageCallback = std::function<void (const Envelope &)>;
 
+  Channel() = default;
   virtual ~Channel() {}
 
   virtual bool exchange_declare(

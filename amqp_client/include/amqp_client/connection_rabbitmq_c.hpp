@@ -40,7 +40,7 @@ public:
 
   virtual ~Connection();
 
-  std::shared_ptr<Channel> channel(
+  std::shared_ptr<amqp_client::Channel> channel(
     const uint16_t * channel_number = nullptr,
     AMQPError * error = nullptr
   ) override;

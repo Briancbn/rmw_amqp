@@ -23,10 +23,13 @@ find_rabbitmq_c()
 # Lib
 add_library(${PROJECT_NAME} SHARED
   src/amqp_error.cpp
+  src/channel_rabbitmq_c.cpp
   src/connection_info.cpp
   src/default_log_handler.cpp
   src/log.cpp
   src/rabbitmq_c_api.cpp
+  src/transport.cpp
+  src/transport_rabbitmq_c.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -42,6 +45,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>"
   "$<INSTALL_INTERFACE:include>"
 )
+
+option(BUILD_EXAMPLES "Build example executables" ON)
+if(BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
