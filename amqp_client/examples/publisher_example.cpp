@@ -42,7 +42,7 @@ int main()
 {
   amqp_client::log::setLogLevel(amqp_client::LogLevel::INFO);
 
-  const std::string exchange    = "ros2";
+  const std::string exchange = "ros2";
   const std::string routing_key = "rt.chatter";   // ROS2 topic /chatter
 
   auto info = std::make_shared<amqp_client::ConnectionInfo>();

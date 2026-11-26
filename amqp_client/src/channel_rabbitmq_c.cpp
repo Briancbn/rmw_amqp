@@ -258,7 +258,7 @@ void Channel::start_consuming(double timeout_sec)
     struct timeval tv;
     struct timeval * tv_ptr = nullptr;
     if (timeout_sec >= 0.0) {
-      tv.tv_sec  = static_cast<long>(timeout_sec);
+      tv.tv_sec = static_cast<long>(timeout_sec);
       tv.tv_usec = static_cast<long>((timeout_sec - tv.tv_sec) * 1e6);
       tv_ptr = &tv;
     }
@@ -282,16 +282,16 @@ void Channel::start_consuming(double timeout_sec)
 
     if (on_message_callback_) {
       Envelope env;
-      env.channel      = envelope.channel;
+      env.channel = envelope.channel;
       env.consumer_tag = std::string(
         reinterpret_cast<const char *>(envelope.consumer_tag.bytes),
         envelope.consumer_tag.len);
       env.delivery_tag = envelope.delivery_tag;
-      env.redelivered  = envelope.redelivered;
-      env.exchange     = std::string(
+      env.redelivered = envelope.redelivered;
+      env.exchange = std::string(
         reinterpret_cast<const char *>(envelope.exchange.bytes),
         envelope.exchange.len);
-      env.routing_key  = std::string(
+      env.routing_key = std::string(
         reinterpret_cast<const char *>(envelope.routing_key.bytes),
         envelope.routing_key.len);
       env.message.body = std::string(

@@ -102,6 +102,9 @@ void AMQPError::from_message(
   AMQPError * error
 )
 {
+  if (error == nullptr) {
+    return;
+  }
   error->type_ = AMQPExceptionType::CUSTOM;
   error->message_ = message;
 }

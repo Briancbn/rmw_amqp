@@ -44,8 +44,8 @@ int main()
 {
   amqp_client::log::setLogLevel(amqp_client::LogLevel::INFO);
 
-  const std::string exchange        = "ros2";
-  const std::string routing_key     = "rt.chatter";   // exact topic to subscribe to
+  const std::string exchange = "ros2";
+  const std::string routing_key = "rt.chatter";       // exact topic to subscribe to
   const std::string binding_pattern = "rt.*";         // wildcard: all /rt/* topics
 
   auto info = std::make_shared<amqp_client::ConnectionInfo>();
@@ -82,9 +82,9 @@ int main()
     [&](const amqp_client::Envelope & env) {
       AMQP_CLIENT_LOG_INFO_STREAM(
         "[" << env.exchange << " / " << env.routing_key << "]"
-        " delivery_tag=" << env.delivery_tag <<
-        " redelivered=" << env.redelivered <<
-        " body=" << env.message.body);
+          " delivery_tag=" << env.delivery_tag <<
+          " redelivered=" << env.redelivered <<
+          " body=" << env.message.body);
     };
 
   // basic_consume(queue, callback, no_local, auto_ack, exclusive, consumer_tag)
